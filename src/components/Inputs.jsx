@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
+import React, {useRef, useState } from 'react'
 import { BiSearch, BiCurrentLocation } from 'react-icons/bi'
 
 export default function Inputs({ setQuery, setUnit }) {
+  const searchRef = useRef();
   const [city, setCity] = useState('')
 
   const handleSearch = () => {
     setQuery({ q: city })
+    searchRef.current.value ='';
   }
 
   const handleLocationClick = () => {
@@ -13,15 +15,19 @@ export default function Inputs({ setQuery, setUnit }) {
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
         console.log("lat: ", latitude, "long: ", longitude)
-        setQuery({ lat: latitude, long: longitude })
+        setQuery({ lat: latitude, lon: longitude })
       })
     }
   }
   return (
     <div className='flex flex-row justify-center my-6'>
       <div className='flex flex-row w-3/4 items-center justify-center space-x-4'>
-        <input type="text" placeholder='Search by city...' className='text-gray-500 text-xl p-2 w-full shadow-xl capitalize focus:outline-none placeholder:lowercase'
+        <input ref={searchRef} type="text" placeholder='Search by city...' className='text-gray-500 text-xl p-2 w-full shadow-xl capitalize focus:outline-none placeholder:lowercase'
           onChange={(e) => { setCity(e.currentTarget.value) }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter")
+              handleSearch();
+          }}
         />
 
         <BiSearch
